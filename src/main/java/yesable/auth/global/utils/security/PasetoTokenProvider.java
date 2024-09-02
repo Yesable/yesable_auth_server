@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import yesable.auth.module.enums.ValidateType;
 
-import javax.crypto.SecretKey;
 import java.security.KeyPair;
+import java.security.PrivateKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -16,12 +16,9 @@ import java.util.function.Function;
 @Slf4j
 @Component
 public class PasetoTokenProvider {
-    private final SecretKey secretKey;
-
     private final KeyPair keyPair;
 
     public PasetoTokenProvider() {
-        secretKey = Keys.secretKey();
         keyPair = Keys.keyPairFor(Version.V2);
     }
 
@@ -50,13 +47,13 @@ public class PasetoTokenProvider {
     public String generateToken(String userId) {
         Instant now = Instant.now();
 
-        return Pasetos.V2.LOCAL.builder()
-                .setSharedSecret(secretKey)
+        return Pasetos.V2.PUBLIC.builder()
+                .setPrivateKey(this.keyPair.getPrivate())
                 .setIssuedAt(now)
                 .setExpiration(now.plus(2, ChronoUnit.HOURS))
                 .setKeyId(UUID.randomUUID().toString())
-                .setAudience("bootlabs.com")
-                .setIssuer("dev.com")
+                .setAudience("yesable")
+                .setIssuer("auth")
                 .claim("user_id", userId)
                 .compact();
     }
@@ -66,7 +63,6 @@ public class PasetoTokenProvider {
      */
     public Paseto parseToken(String token) {
         PasetoParser parser = Pasetos.parserBuilder()
-                .setSharedSecret(secretKey)
                 .setPublicKey(keyPair.getPublic())
                 .build();
 

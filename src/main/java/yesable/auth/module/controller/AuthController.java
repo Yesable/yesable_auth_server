@@ -14,7 +14,7 @@ import yesable.auth.module.model.request.VerifyAuthRequest;
 import yesable.auth.service.service.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth-service/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "Auth", description = "Auth 관련 컨트롤러 (기업/사용자 userType 으로 구분)")
 public class AuthController {
