@@ -2,7 +2,7 @@ package yesable.auth.module.client;
 
 import io.grpc.ManagedChannel;
 import org.springframework.stereotype.Component;
-import yesable.auth.service.service.*;
+import yesable.auth.module.service.*;
 
 @Component
 public class AuthGrpcClient {

@@ -24,7 +24,6 @@ public class AuthGrpcServer {
     }
 
     public void start() throws IOException, InterruptedException {
-        // Configure the server with SO_REUSEADDR option enabled
         Server server = NettyServerBuilder.forPort(grpcPort)
                 .withChildOption(ChannelOption.SO_REUSEADDR, true)
                 .addService(authService)
@@ -33,14 +32,12 @@ public class AuthGrpcServer {
 
         System.out.println("Server started, listening on " + server.getPort());
 
-        // Add shutdown hook to stop the server gracefully
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutting down gRPC server since JVM is shutting down");
             this.stop(server);
             System.out.println("Server shut down");
         }));
 
-        // Keep the server running until it is terminated
         blockUntilShutdown(server);
     }
 

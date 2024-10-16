@@ -55,6 +55,7 @@ public class PasetoTokenProvider {
                 .setAudience("yesable")
                 .setIssuer("auth")
                 .claim("user_id", userId)
+                .setSubject(userId)
                 .compact();
     }
 

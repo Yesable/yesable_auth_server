@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 import yesable.auth.module.enums.ValidateType;
 import yesable.auth.global.utils.security.PasetoTokenProvider;
-import yesable.auth.service.service.*;
+import yesable.auth.*;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -25,13 +25,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
     @Override
     public void createAuth(CreateTokenRequest request, StreamObserver<CreateTokenResponse> responseObserver) {
         // 사용자 검증
-        String userId;
-        if(request.getAuth().getUserType().equals(UserType.MEMBER)) // 일반 회원
-            userId = "TEST_MEMBER";
-        else if (request.getAuth().getUserType().equals(UserType.COMPANY)) //  기업 회원
-            userId = "TEST_COMPANY";
-        else // 그 외
-            throw new RuntimeException();
+        String userId = "1010";
 
         // 토큰 생성
         String token = pasetoTokenProvider.generateToken(userId);
@@ -39,8 +33,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
         Instant now = Instant.now();
         CreateTokenResponse response = CreateTokenResponse.newBuilder().setAuth(
                             AuthData.newBuilder()
-                                .setId(request.getAuth().getId())
-                                .setPw(request.getAuth().getPw())
+                                .setUserId(userId)
                                 .setCreateTime(now.toEpochMilli())
                                 .setExpireTime(now.plus(2, ChronoUnit.HOURS).toEpochMilli())
                                 .setToken(token))
@@ -75,7 +68,7 @@ public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
                 .setV(verifyBuilder
                         .setStatusValue(statusValue)
                         .setAuth(AuthData.newBuilder()
-                                .setId(pasetoTokenProvider.extractId(request.getToken()))
+                                .setUserId(pasetoTokenProvider.extractId(request.getToken()))
                                 .setToken(request.getToken()))
                         .build())
                 .build();
