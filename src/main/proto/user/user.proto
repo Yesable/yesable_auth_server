@@ -1,0 +1,168 @@
+syntax="proto3";
+
+option java_multiple_files = true;
+option java_package= "com.example.grpc";
+option java_outer_classname = "UserServiceProto";
+
+package user;
+
+service UserService {
+    rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse);
+    rpc GetPrivateUserId(GetPrivateUserIdRequest) returns(GetPrivateUserIdResponse);
+
+}
+
+enum InterestFieldGRPC {
+  INTEREST_FIELD_G_R_P_C_UNSPECIFIED = 0;
+  FOOD = 1;
+  RETAIL = 2;
+  CULTURE = 3;
+  SERVICE = 4;
+  AFFAIR = 5;
+  SALES = 6;
+  MANUFACTURE = 7;
+  IT = 8;
+  DESIGN = 9;
+  DRIVE = 10;
+  EDUCATION = 11;
+  HOSPITAL = 12;
+  MEDIA = 13;
+}
+
+enum GenderGRPC {
+  GENDER_G_R_P_C_UNSPECIFIED = 0;
+  MALE = 1;
+  FEMALE = 2;
+  ETC = 3;
+}
+
+enum WorkTypeGRPC {
+  WORK_TYPE_G_R_P_C_UNSPECIFIED = 0;
+  PARTTIMEJOB = 1;
+  INTERN = 2;
+  CONTRACT = 3;
+  FULLTIME = 4;
+}
+
+enum EducationlevelGRPC {
+  EDUCATIONLEVEL_G_R_P_C_UNSPECIFIED = 0;
+  CHOJOL = 1;
+  JUNGJOL = 2;
+  GOJOL = 3;
+  UNIV23 = 4;
+  UNIV4 = 5;
+  GRADUATESCHOOL = 6;
+}
+
+enum DisabilitytypeGRPC {
+  DISABILITYTYPE_G_R_P_C_UNSPECIFIED = 0;
+  PHYSICAL_DISABILITY_MOBILITY_IMPAIRED = 1;
+  PHYSICAL_DISABILITY_BRAIN_LESSON = 2;
+  PHYSICAL_DISABILITY_VISUAL_IMPAIRED = 3;
+  PHYSICAL_DISABILITY_HEARING_IMPAIRED = 4;
+  PHYSICAL_DISABILITY_SPEECH_IMPAIRED = 5;
+  PHYSICAL_DISABILITY_FACIAL_IMPAIRED = 6;
+  PHYSICAL_DISABILITY_KIDNEY_IMPAIRED = 7;
+  PHYSICAL_DISABILITY_HEART_IMPAIRED = 8;
+  PHYSICAL_DISABILITY_RESPIRATORY_IMPAIRED = 9;
+  PHYSICAL_DISABILITY_LIVER_IMPAIRED = 10;
+  PHYSICAL_DISABILITY_STOMA_IMPAIRED = 11;
+  PHYSICAL_DISABILITY_EPILEPSY_IMPAIRED = 12;
+  MENTAL_DISABILITY_INTELLECTUAL_IMPAIRED = 13;
+  MENTAL_DISABILITY_MENTAL_IMPAIRED = 14;
+  MENTAL_DISABILITY_AUTISM_IMPAIRED = 15;
+}
+
+enum CompclassGRPC {
+  COMPCLASS_G_R_P_C_UNSPECIFIED = 0;
+  SMALL = 1;
+  MIDDLE = 2;
+  BIG = 3;
+}
+
+enum ExperiencetypeGRPC {
+  EXPERIENCETYPE_G_R_P_C_UNSPECIFIED = 0;
+  NOEXPERIENCE = 1;
+  YESEXPERIENCE = 2;
+}
+//--------------------------------------------  enum ^
+message RegisterUserRequest {
+  PrivateUserGRPC privateuser=1;
+}
+
+message RegisterUserResponse {
+  string message = 1;
+  bool success = 2;
+}
+
+
+
+
+message GetPrivateUserIdRequest {
+  string encuserId=1; //암호화된 사용자 로그인 ID
+  string encuserpassword=2; //암호화된 사용자 로그인 비밀번호
+}
+
+message GetPrivateUserIdResponse {
+  double userseq=1; //해당 유저의 db에 저장되는 id
+}
+
+//--------------------------------
+
+message CoreUserGRPC {
+  string id=1; //엔티티의 id가 아니라 qwer같은 아이디
+  string password=2;
+  string email=3;
+  string phoneNumber=4;
+  string name=5;
+
+
+  GenderGRPC gender=6;
+
+  LocalDateGRPC dateOfBirth=7;
+
+  repeated string authorities=8;
+}
+
+message PrivateUserGRPC {
+  CoreUserGRPC core_user = 1;
+  string username=2;
+  string location=3;
+
+
+  repeated InterestFieldGRPC interestField=4;
+  repeated WorkTypeGRPC workType=5;
+
+
+  repeated string skills=6;
+
+  EducationlevelGRPC educationlevel = 7;
+  string personality=8;
+  string hobbies=9;
+  string supportneeds=10;
+
+
+  DisabilitytypeGRPC disabilitytype=11;
+  repeated ExperienceGRPC experiences=12;
+}
+
+
+
+
+message ExperienceGRPC {
+  int64 userSeq=1; //어떤 USer의 경력인지
+
+
+  ExperiencetypeGRPC experiencetype=3;
+  string companyname=4;
+  LocalDateGRPC startdate=5;
+  LocalDateGRPC enddate=6;
+  string department=7;
+  string jobdescription=8;
+}
+
+message LocalDateGRPC {
+  int32 year=1;
+  int32 month=2;
+  int32 day=3;
+}

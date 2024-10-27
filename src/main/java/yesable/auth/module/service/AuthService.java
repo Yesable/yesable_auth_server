@@ -1,11 +1,14 @@
 package yesable.auth.module.service;
 
+import com.example.grpc.GetPrivateUserIdResponse;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
+import yesable.auth.global.client.PrivateUserClient;
 import yesable.auth.module.enums.ValidateType;
 import yesable.auth.global.utils.security.PasetoTokenProvider;
-import yesable.auth.*;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -18,35 +21,40 @@ import java.time.temporal.ChronoUnit;
 public class AuthService extends AuthServiceGrpc.AuthServiceImplBase {
 
     private final PasetoTokenProvider pasetoTokenProvider;
+    private final PrivateUserClient privateUserClient;
 
     /**
      * 일반 로그인
      */
     @Override
     public void createAuth(CreateTokenRequest request, StreamObserver<CreateTokenResponse> responseObserver) {
-        // 사용자 검증
-        String userId = "1010";
+        try {
+            GetPrivateUserIdResponse userResponse = privateUserClient.getPrivateUserId(request.getLogin().getAccount());
 
-        // 토큰 생성
-        String token = pasetoTokenProvider.generateToken(userId);
+            if (userResponse == null) {
+                responseObserver.onError(new StatusRuntimeException(Status.NOT_FOUND.withDescription("User not found")));
+                return;
+            }
 
-        Instant now = Instant.now();
-        CreateTokenResponse response = CreateTokenResponse.newBuilder().setAuth(
+            String userId = String.valueOf(userResponse.getUserseq());
+
+            String token = pasetoTokenProvider.generateToken(userId);
+
+            Instant now = Instant.now();
+            CreateTokenResponse response = CreateTokenResponse.newBuilder().setAuth(
                             AuthData.newBuilder()
-                                .setUserId(userId)
-                                .setCreateTime(now.toEpochMilli())
-                                .setExpireTime(now.plus(2, ChronoUnit.HOURS).toEpochMilli())
-                                .setToken(token))
-        .build();
+                                    .setUserId(userId)
+                                    .setCreateTime(now.toEpochMilli())
+                                    .setExpireTime(now.plus(2, ChronoUnit.HOURS).toEpochMilli())
+                                    .setToken(token))
+                    .build();
 
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (StatusRuntimeException e) {
+            responseObserver.onError(new StatusRuntimeException(Status.INTERNAL.withDescription("Failed to create auth")));
+        }
     }
-
-    /**
-     * oAuth 기반 로그인
-     */
 
     /**
      * 토큰 검증
